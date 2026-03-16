@@ -41,8 +41,10 @@ function Typewriter() {
       if (displayed.length > 0) {
         tick.current = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 38);
       } else {
-        setRoleIdx((i) => (i + 1) % ROLES.length);
-        setPhase('typing');
+        tick.current = setTimeout(() => {
+          setRoleIdx((i) => (i + 1) % ROLES.length);
+          setPhase('typing');
+        }, 80);
       }
     }
     return () => clearTimeout(tick.current);
@@ -175,7 +177,7 @@ function MagBtn({ children, onClick, href, className = '' }) {
 }
 
 // ── Floating particle ────────────────────────────────────────────────────────
-function Particle({ size, color, style }) {
+function Particle({ size, color, style, duration, delay }) {
   return (
     <motion.div
       className={`absolute rounded-full ${color} blur-sm`}
@@ -187,10 +189,10 @@ function Particle({ size, color, style }) {
         scale: [1, 1.15, 0.9, 1.1, 1],
       }}
       transition={{
-        duration: 10 + Math.random() * 8,
+        duration,
         repeat: Infinity,
         ease: 'easeInOut',
-        delay: Math.random() * 4,
+        delay,
       }}
     />
   );
@@ -268,12 +270,12 @@ export default function Hero() {
     >
       {/* Particles */}
       <div className="pointer-events-none absolute inset-0">
-        <Particle size={10} color="bg-teal-400/70"  style={{ top: '18%', left: '12%' }} />
-        <Particle size={8}  color="bg-amber-400/70" style={{ top: '35%', left: '75%' }} />
-        <Particle size={14} color="bg-cyan-400/60"  style={{ top: '65%', left: '5%' }} />
-        <Particle size={7}  color="bg-violet-400/70" style={{ top: '20%', left: '55%' }} />
-        <Particle size={12} color="bg-rose-400/60"  style={{ top: '75%', left: '85%' }} />
-        <Particle size={9}  color="bg-sky-400/70"   style={{ top: '50%', left: '45%' }} />
+        <Particle size={10} color="bg-teal-400/70" style={{ top: '18%', left: '12%' }} duration={13.2} delay={0.3} />
+        <Particle size={8} color="bg-amber-400/70" style={{ top: '35%', left: '75%' }} duration={16.8} delay={1.1} />
+        <Particle size={14} color="bg-cyan-400/60" style={{ top: '65%', left: '5%' }} duration={12.7} delay={2.4} />
+        <Particle size={7} color="bg-violet-400/70" style={{ top: '20%', left: '55%' }} duration={17.1} delay={0.9} />
+        <Particle size={12} color="bg-rose-400/60" style={{ top: '75%', left: '85%' }} duration={14.6} delay={1.8} />
+        <Particle size={9} color="bg-sky-400/70" style={{ top: '50%', left: '45%' }} duration={15.4} delay={2.9} />
       </div>
 
       <div className="mx-auto grid min-h-[calc(100vh-7rem)] max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
