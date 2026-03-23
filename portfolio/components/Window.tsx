@@ -40,7 +40,7 @@ export default function Window({
   onMaximize,
   onFocus,
 }: WindowProps) {
-  const nodeRef = useRef<HTMLElement>(null);
+  const nodeRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   return (
@@ -50,7 +50,7 @@ export default function Window({
       defaultPosition={initialPosition}
       disabled={maximized || minimizing || closing}
       position={maximized ? { x: 0, y: 0 } : undefined}
-      nodeRef={nodeRef}
+      nodeRef={nodeRef as unknown as React.RefObject<HTMLElement>}
       onStart={() => setIsDragging(true)}
       onStop={() => setIsDragging(false)}
     >
@@ -67,7 +67,7 @@ export default function Window({
         } ${
           active
             ? "border-white/20 brightness-[1.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_25px_80px_rgba(0,0,0,0.7),0_0_18px_rgba(6,182,212,0.10)]"
-            : "border-white/10 opacity-70 scale-[0.98] blur-[0.5px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_16px_48px_rgba(0,0,0,0.58)]"
+            : "border-white/10 opacity-70 blur-[0.5px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_16px_48px_rgba(0,0,0,0.58)]"
         } ${isDragging ? "cursor-grabbing shadow-[0_26px_70px_rgba(0,0,0,0.68)]" : ""}`}
       >
         <motion.div
@@ -77,7 +77,7 @@ export default function Window({
               ? { scale: 0.22, y: 420, x: 40, opacity: 0.25 }
               : closing
                 ? { scale: 0.9, y: 14, opacity: 0.6 }
-                : { scale: 1, y: 0, x: 0, opacity: 1 }
+                : { scale: active ? 1 : 0.98, y: 0, x: 0, opacity: 1 }
           }
           transition={{ duration: 0.2, ease: "easeOut" }}
         >

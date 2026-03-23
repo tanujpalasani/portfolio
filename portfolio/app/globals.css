@@ -19,3 +19,51 @@ body {
 body {
   margin: 0;
 }
+
+@keyframes float-cyan {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(32px, -20px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes float-blue {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-26px, 18px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes float-purple {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(18px, -24px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.bg-float-cyan {
+  animation: float-cyan 16s ease-in-out infinite;
+}
+
+.bg-float-blue {
+  animation: float-blue 20s ease-in-out infinite;
+}
+
+.bg-float-purple {
+  animation: float-purple 18s ease-in-out infinite;
+}
