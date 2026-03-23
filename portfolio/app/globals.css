@@ -20,50 +20,124 @@ body {
   margin: 0;
 }
 
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Floating Background Blobs */
 @keyframes float-cyan {
-  0% {
-    transform: translate3d(0, 0, 0);
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
-  50% {
-    transform: translate3d(32px, -20px, 0);
+  33% {
+    transform: translate3d(32px, -20px, 0) scale(1.05);
   }
-  100% {
-    transform: translate3d(0, 0, 0);
+  66% {
+    transform: translate3d(-10px, 15px, 0) scale(0.95);
   }
 }
 
 @keyframes float-blue {
-  0% {
-    transform: translate3d(0, 0, 0);
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
-  50% {
-    transform: translate3d(-26px, 18px, 0);
+  33% {
+    transform: translate3d(-26px, 18px, 0) scale(1.08);
   }
-  100% {
-    transform: translate3d(0, 0, 0);
+  66% {
+    transform: translate3d(15px, -12px, 0) scale(0.92);
   }
 }
 
 @keyframes float-purple {
-  0% {
-    transform: translate3d(0, 0, 0);
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
-  50% {
-    transform: translate3d(18px, -24px, 0);
+  33% {
+    transform: translate3d(18px, -24px, 0) scale(0.96);
   }
-  100% {
-    transform: translate3d(0, 0, 0);
+  66% {
+    transform: translate3d(-20px, 10px, 0) scale(1.04);
   }
 }
 
 .bg-float-cyan {
-  animation: float-cyan 16s ease-in-out infinite;
+  animation: float-cyan 18s ease-in-out infinite;
 }
 
 .bg-float-blue {
-  animation: float-blue 20s ease-in-out infinite;
+  animation: float-blue 22s ease-in-out infinite;
 }
 
 .bg-float-purple {
-  animation: float-purple 18s ease-in-out infinite;
+  animation: float-purple 20s ease-in-out infinite;
+}
+
+/* Noise Texture Effect */
+@keyframes noise-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2%, -1.5%, 0);
+  }
+}
+
+.about-noise::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 0.6px, transparent 0.6px);
+  background-size: 4px 4px;
+  mix-blend-mode: soft-light;
+  animation: noise-drift 18s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Glass Morphism Effects */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 25px 70px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Premium Focus States */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.6);
+  outline-offset: 2px;
+}
+
+/* Smooth Transitions */
+.transition-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

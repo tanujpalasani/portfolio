@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useMotionValue } from "framer-motion";
 import { useState } from "react";
 
 import DockIcon from "./DockIcon";
@@ -8,68 +9,72 @@ import { useWindowStore } from "@/store/useWindowStore";
 
 export default function Dock() {
   const openWindow = useWindowStore((state) => state.openWindow);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  const getProximityScale = (iconIndex: number) => {
-    if (hoveredIndex === null) {
-      return 1;
-    }
-
-    const distance = Math.abs(iconIndex - hoveredIndex);
-    if (distance === 0) {
-      return 1.4;
-    }
-    if (distance === 1) {
-      return 1.18;
-    }
-    if (distance === 2) {
-      return 1.08;
-    }
-
-    return 1;
-  };
-
-  const getProximityY = (iconIndex: number) => {
-    if (hoveredIndex === null) {
-      return 0;
-    }
-
-    const distance = Math.abs(iconIndex - hoveredIndex);
-    if (distance === 0) {
-      return -10;
-    }
-    if (distance === 1) {
-      return -6;
-    }
-    if (distance === 2) {
-      return -3;
-    }
-
-    return 0;
-  };
+  const mouseX = useMotionValue(Number.POSITIVE_INFINITY);
+  const [isDockHovered, setIsDockHovered] = useState(false);
 
   return (
-    <footer className="pointer-events-auto absolute inset-x-0 bottom-5 z-30 flex justify-center px-4 sm:bottom-8">
-      <div
-        className="flex items-end gap-3 rounded-[2rem] border border-white/20 bg-white/10 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_18px_45px_rgba(0,0,0,0.45)] shadow-inner backdrop-blur-xl"
-        onMouseLeave={() => setHoveredIndex(null)}
+    <footer className="pointer-events-auto absolute inset-x-0 bottom-5 z-40 flex justify-center px-4 sm:bottom-8">
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 28, delay: 0.1 }}
+        className="relative"
       >
-        {devOSApps.map((app, index) => (
-          <DockIcon
-            key={app.id}
-            id={app.id}
-            label={app.label}
-            Icon={app.icon}
-            accentClass={app.accentClass}
-            scale={getProximityScale(index)}
-            offsetY={getProximityY(index)}
-            isHovered={hoveredIndex === index}
-            onHoverStart={() => setHoveredIndex(index)}
-            onHoverEnd={() => setHoveredIndex(null)}
-            onOpen={openWindow}
+        <motion.div
+          className="pointer-events-none absolute left-1/2 top-full h-14 w-[92%] -translate-x-1/2 rounded-full bg-gradient-to-r from-cyan-400/35 via-blue-400/30 to-violet-400/30 blur-2xl"
+          animate={{ opacity: isDockHovered ? 0.88 : 0.46, scaleX: isDockHovered ? 1.08 : 1 }}
+          transition={{ duration: 0.4 }}
+        />
+
+        <motion.div
+          className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-cyan-400/24 via-blue-400/16 to-transparent blur-2xl"
+          animate={{ opacity: isDockHovered ? 0.95 : 0.38 }}
+          transition={{ duration: 0.35 }}
+        />
+
+        <motion.div
+          className="relative flex items-end gap-3 rounded-[2rem] border border-white/22 bg-white/[0.08] px-4 py-3 shadow-dock backdrop-blur-2xl"
+          onMouseEnter={() => setIsDockHovered(true)}
+          onMouseMove={(event) => mouseX.set(event.clientX)}
+          onMouseLeave={() => {
+            setIsDockHovered(false);
+            mouseX.set(Number.POSITIVE_INFINITY);
+          }}
+          whileHover={{ borderColor: "rgba(255, 255, 255, 0.28)", transition: { duration: 0.3 } }}
+        >
+          <div className="pointer-events-none absolute inset-x-3 -top-2 h-4 rounded-full bg-gradient-to-b from-white/20 to-transparent blur-[1px]" />
+
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent"
+              animate={{ x: ["-100%", "200%"] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 2 }}
+            />
+          </div>
+
+          <div
+            className="pointer-events-none absolute inset-0 rounded-[2rem] opacity-30 mix-blend-soft-light"
+            style={{
+              backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.1) 0.5px, transparent 0.5px)",
+              backgroundSize: "3px 3px",
+            }}
           />
-        ))}
-      </div>
+
+          <div className="relative z-10 flex items-end gap-3">
+            {devOSApps.map((app) => (
+              <DockIcon
+                key={app.id}
+                id={app.id}
+                label={app.label}
+                Icon={app.icon}
+                accentClass={app.accentClass}
+                mouseX={mouseX}
+                onOpen={openWindow}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
     </footer>
   );
 }

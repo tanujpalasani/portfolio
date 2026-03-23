@@ -1,161 +1,90 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
-import { Github, Linkedin, Mail, Phone } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Download } from "lucide-react";
 
-import ProjectCard from "./ProjectCard";
-import SkillBadge from "./SkillBadge";
-import Terminal from "./Terminal";
+import AboutWindow from "./AboutWindow";
+import AchievementsWindow from "./AchievementsWindow";
+import CertificatesWindow from "./CertificatesWindow";
+import ContactWindow from "./ContactWindow";
+import EducationWindow from "./EducationWindow";
+import GitHubWindow from "./GitHubWindow";
+import LinkedInWindow from "./LinkedInWindow";
+import ProjectsWindow from "./ProjectsWindow";
+import SkillsWindow from "./SkillsWindow";
+import TerminalWindow from "./TerminalWindow";
 import Window from "./Window";
+import { portfolio } from "@/data/portfolio";
 import { useWindowStore, type WindowId } from "@/store/useWindowStore";
 
 const windowBodyById: Record<WindowId, React.ReactNode> = {
   about: (
-    <div className="space-y-5">
-      <div className="space-y-1.5">
-        <h3 className="text-2xl font-semibold text-white">Palasani Sai Venkata Tanuj</h3>
-        <p className="text-sm font-medium text-slate-200/90">
-          B.Tech CSE Student | Full-Stack & ML Developer
-        </p>
-      </div>
-
-      <p className="max-w-2xl text-sm leading-6 text-slate-200/85">
-        Computer Science undergraduate at Lovely Professional University (CGPA: 8.71) building practical software
-        in full-stack web development and machine learning. I focus on clean architecture, reliable APIs,
-        and insight-driven products.
-      </p>
-
-      <section className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300/75">Resume highlights</p>
-        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-100/90">
-          <li>Filed a patent for AI-based personalized chore scheduling (App No: 202511067786)</li>
-          <li>Runner-up at Hack-a-Throne 1.0 Hackathon (GeeksforGeeks)</li>
-          <li>Hands-on machine learning pipeline work across regression, clustering, and anomaly detection</li>
-          <li>Strong soft skills: leadership, communication, critical thinking, time management, creativity</li>
-        </ul>
-      </section>
-    </div>
+    <AboutWindow />
+  ),
+  education: (
+    <EducationWindow />
+  ),
+  certificates: (
+    <CertificatesWindow />
   ),
   projects: (
-    <div className="space-y-4">
-      <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-white">Featured Projects</h3>
-        <p className="text-xs text-slate-300/75">Selected builds with stack and source links.</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <ProjectCard
-          name="PlanIt - Project Management Platform (Feb 2026)"
-          description="Full-stack MERN platform with role-based access control, JWT authentication, and responsive analytics dashboards powered by React Context API."
-          techStack={["React.js", "Node.js", "Express.js", "MongoDB", "Tailwind CSS", "JWT"]}
-          href="https://github.com/tanujpalasani"
-        />
-        <ProjectCard
-          name="LMS Student Behavior Analytics Dashboard (Nov 2025)"
-          description="Analytics app for LMS behavior segmentation using clustering with Elbow/Silhouette model selection and interactive Plotly dashboards."
-          techStack={["Python", "Streamlit", "Scikit-learn", "Pandas", "NumPy", "Plotly"]}
-          href="https://github.com/tanujpalasani"
-        />
-        <ProjectCard
-          name="Vehicle Load Monitoring System (May 2025)"
-          description="Vehicle monitoring system for overload prediction using regression and anomaly detection, with REST-style APIs and historical dashboards."
-          techStack={["Python", "Flask", "Scikit-learn", "SQLite", "Chart.js", "Bootstrap"]}
-          href="https://github.com/tanujpalasani"
-        />
-      </div>
-    </div>
+    <ProjectsWindow />
   ),
   skills: (
-    <div className="space-y-5">
-      <h3 className="text-lg font-semibold text-white">Skills</h3>
-
-      <section className="space-y-2.5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300/75">Languages</p>
-        <div className="flex flex-wrap gap-2">
-          {["Python", "JavaScript", "C++"].map((skill) => (
-            <SkillBadge key={skill} label={skill} />
-          ))}
+    <SkillsWindow />
+  ),
+  resume: (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="space-y-4"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold text-white">Resume</h3>
+          <p className="text-xs text-slate-300/70">{portfolio.personal.name} - Latest PDF</p>
         </div>
-      </section>
+        <motion.a
+          href={portfolio.personal.resumePath}
+          download
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          className="group inline-flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/15 to-blue-500/10 px-4 py-2.5 text-xs font-semibold text-cyan-100 shadow-[inset_0_1px_0_rgba(147,197,253,0.2),0_4px_12px_rgba(34,211,238,0.2)] transition-all hover:border-cyan-300/40 hover:from-cyan-400/20 hover:to-blue-500/15 hover:shadow-[inset_0_1px_0_rgba(147,197,253,0.25),0_8px_20px_rgba(34,211,238,0.3)]"
+        >
+          <Download size={15} />
+          <span>Download Resume</span>
+        </motion.a>
+      </div>
 
-      <section className="space-y-2.5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300/75">Web Technologies</p>
-        <div className="flex flex-wrap gap-2">
-          {["React.js", "Next.js", "HTML", "CSS", "Tailwind CSS", "Node.js", "Express.js"].map((skill) => (
-            <SkillBadge key={skill} label={skill} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-2.5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300/75">Database</p>
-        <div className="flex flex-wrap gap-2">
-          {["MongoDB", "MySQL"].map((skill) => (
-            <SkillBadge key={skill} label={skill} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-2.5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300/75">Machine Learning</p>
-        <div className="flex flex-wrap gap-2">
-          {["Classification", "Regression", "Clustering", "NLP (Basics)", "Scikit-learn"].map((skill) => (
-            <SkillBadge key={skill} label={skill} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-2.5">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300/75">Tools & Platforms</p>
-        <div className="flex flex-wrap gap-2">
-          {["Git", "GitHub", "Postman", "VS Code", "Linux", "Streamlit", "Google Colab"].map((skill) => (
-            <SkillBadge key={skill} label={skill} />
-          ))}
-        </div>
-      </section>
-    </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="overflow-hidden rounded-2xl border border-white/12 bg-black/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.4)]"
+      >
+        <iframe
+          src={`${portfolio.personal.resumePath}#view=FitH`}
+          title={`${portfolio.personal.shortName} Resume`}
+          className="h-[380px] w-full"
+        />
+      </motion.div>
+    </motion.div>
+  ),
+  github: (
+    <GitHubWindow />
+  ),
+  linkedin: (
+    <LinkedInWindow />
+  ),
+  achievements: (
+    <AchievementsWindow />
   ),
   contact: (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-white">Contact</h3>
-      <div className="space-y-2.5">
-        <a
-          href="mailto:tanujpalasani@gmail.com"
-          className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2.5 text-sm text-slate-100/90 transition hover:border-white/15 hover:bg-white/[0.045]"
-        >
-          <Mail size={16} />
-          <span>tanujpalasani@gmail.com</span>
-        </a>
-        <a
-          href="tel:+917981533673"
-          className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2.5 text-sm text-slate-100/90 transition hover:border-white/15 hover:bg-white/[0.045]"
-        >
-          <Phone size={16} />
-          <span>+91-7981533673</span>
-        </a>
-        <a
-          href="https://linkedin.com/in/tanujpalasani"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2.5 text-sm text-slate-100/90 transition hover:border-white/15 hover:bg-white/[0.045]"
-        >
-          <Linkedin size={16} />
-          <span>linkedin.com/in/tanujpalasani</span>
-        </a>
-        <a
-          href="https://github.com/tanujpalasani"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2.5 text-sm text-slate-100/90 transition hover:border-white/15 hover:bg-white/[0.045]"
-        >
-          <Github size={16} />
-          <span>github.com/tanujpalasani</span>
-        </a>
-      </div>
-    </div>
+    <ContactWindow />
   ),
   terminal: (
-    <Terminal />
+    <TerminalWindow />
   ),
 };
 
@@ -171,24 +100,23 @@ export default function WindowManager() {
     <section className="pointer-events-none absolute inset-0 z-30">
       <AnimatePresence>
         {windows.filter((windowItem) => !windowItem.isMinimized).map((windowItem) => (
-          <div key={windowItem.id} className="pointer-events-auto">
-            <Window
-              id={windowItem.id}
-              title={windowItem.title}
-              zIndex={windowItem.zIndex}
-              maximized={windowItem.isMaximized}
-              minimizing={windowItem.isMinimizing}
-              closing={windowItem.isClosing}
-              initialPosition={windowItem.initialPosition}
-              active={activeWindowId === windowItem.id}
-              onClose={closeWindow}
-              onMinimize={minimizeWindow}
-              onMaximize={toggleMaximizeWindow}
-              onFocus={focusWindow}
-            >
-              {windowBodyById[windowItem.id]}
-            </Window>
-          </div>
+          <Window
+            key={windowItem.id}
+            id={windowItem.id}
+            title={windowItem.title}
+            zIndex={windowItem.zIndex}
+            maximized={windowItem.isMaximized}
+            minimizing={windowItem.isMinimizing}
+            closing={windowItem.isClosing}
+            initialPosition={windowItem.initialPosition}
+            active={activeWindowId === windowItem.id}
+            onClose={closeWindow}
+            onMinimize={minimizeWindow}
+            onMaximize={toggleMaximizeWindow}
+            onFocus={focusWindow}
+          >
+            {windowBodyById[windowItem.id]}
+          </Window>
         ))}
       </AnimatePresence>
     </section>

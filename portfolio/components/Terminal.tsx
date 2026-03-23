@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import { portfolio } from "@/data/portfolio";
 import { useWindowStore } from "@/store/useWindowStore";
 
 type EntryKind = "command" | "output" | "error" | "success";
@@ -76,10 +78,10 @@ function getResponse(command: string): CommandResponse {
       return {
         kind: "output",
         lines: [
-          "Email: tanujpalasani@gmail.com",
-          "Mobile: +91-7981533673",
-          "GitHub: github.com/tanujpalasani",
-          "LinkedIn: linkedin.com/in/tanujpalasani",
+          `Email: ${portfolio.personal.email}`,
+          `Mobile: ${portfolio.personal.phone}`,
+          `GitHub: ${portfolio.personal.githubHandle}`,
+          `LinkedIn: ${portfolio.personal.linkedinHandle}`,
         ],
       };
     case "whoami":
@@ -266,21 +268,21 @@ export default function Terminal() {
     setHistory((prev) => [...prev, commandEntry]);
 
     if (command === "resume") {
-      window.open("/tanuj_resume.pdf", "_blank", "noopener,noreferrer");
+      window.open(portfolio.personal.resumePath, "_blank", "noopener,noreferrer");
       enqueueTypedLines("success", ["Opening resume..."]);
       setInput("");
       return;
     }
 
     if (command === "github") {
-      window.open("https://github.com/tanujpalasani", "_blank", "noopener,noreferrer");
+      window.open(portfolio.personal.github, "_blank", "noopener,noreferrer");
       enqueueTypedLines("success", ["Opening GitHub profile..."]);
       setInput("");
       return;
     }
 
     if (command === "linkedin") {
-      window.open("https://linkedin.com/in/tanujpalasani", "_blank", "noopener,noreferrer");
+      window.open(portfolio.personal.linkedin, "_blank", "noopener,noreferrer");
       enqueueTypedLines("success", ["Opening LinkedIn profile..."]);
       setInput("");
       return;
@@ -354,32 +356,43 @@ export default function Terminal() {
 
   return (
     <div
-      className="mx-auto flex h-[320px] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-green-500/10 bg-black/80 font-mono text-[13px] leading-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] shadow-inner"
+      className="mx-auto flex h-[340px] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-black/85 to-black/90 font-mono text-[13px] leading-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_12px_32px_rgba(0,0,0,0.5),0_0_40px_rgba(16,185,129,0.08)]"
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="border-b border-green-500/10 bg-black/40 px-3 py-2 text-[11px] tracking-wide text-emerald-300/80">
-        terminal session
+      {/* Terminal Header */}
+      <div className="relative border-b border-emerald-500/12 bg-gradient-to-r from-black/50 to-black/30 px-4 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            <span className="text-[11px] font-medium tracking-wide text-emerald-300/80">terminal session</span>
+          </div>
+          <div className="text-[10px] tracking-wide text-emerald-400/60">DevOS v1.0</div>
+        </div>
+        {/* Animated line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3">
+      {/* Terminal Output */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3">
         {history.map((entry) => (
-          <div key={entry.id} className={`break-words ${entry.kind === "command" ? "mt-2 first:mt-0" : "mt-0.5"}`}>
+          <div key={entry.id} className={`break-words ${entry.kind === "command" ? "mt-2.5 first:mt-0" : "mt-0.5"}`}>
             {entry.kind === "command" ? (
               <div className="text-cyan-400">
-                {promptLine} <span className="text-cyan-300">{entry.text}</span>
+                {promptLine} <span className="font-semibold text-cyan-300">{entry.text}</span>
               </div>
             ) : entry.kind === "error" ? (
               <div className="text-red-400">{entry.text}</div>
             ) : entry.kind === "success" ? (
-              <div className="text-green-400">{entry.text}</div>
+              <div className="text-emerald-400">{entry.text}</div>
             ) : (
-              <div className="text-white/80">{entry.text}</div>
+              <div className="text-white/85">{entry.text}</div>
             )}
           </div>
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-green-500/10 px-3 py-2">
+      {/* Terminal Input */}
+      <form onSubmit={handleSubmit} className="border-t border-emerald-500/12 bg-black/40 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
         <label className="flex items-center gap-2">
           {promptLine}
           <input
@@ -390,22 +403,24 @@ export default function Terminal() {
             autoComplete="off"
             spellCheck={false}
             disabled={isBooting}
-            className="w-full bg-transparent text-white/90 outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full bg-transparent text-white/95 caret-emerald-300 outline-none disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Terminal command input"
           />
           <span
-            className={`inline-block h-4 w-2 align-middle rounded-[1px] bg-emerald-300/90 transition-opacity duration-100 ${
+            className={`inline-block h-4 w-2 rounded-[1px] bg-emerald-300/95 shadow-[0_0_8px_rgba(52,211,153,0.6)] transition-opacity duration-100 ${
               cursorVisible ? "opacity-100" : "opacity-0"
             }`}
           />
         </label>
-        <div className="mt-1 text-[10px] text-slate-400/90">
-          <p>Suggestions:</p>
-          {commandSuggestions.map((suggestion) => (
-            <p key={suggestion} className="text-slate-300/80">
-              {"\u2192"} {suggestion}
-            </p>
-          ))}
+        <div className="mt-2 rounded-lg border border-emerald-500/8 bg-emerald-500/[0.02] px-2.5 py-2 text-[10px]">
+          <p className="font-medium text-slate-400/80">Suggestions:</p>
+          <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+            {commandSuggestions.map((suggestion) => (
+              <p key={suggestion} className="text-emerald-300/75 transition-colors hover:text-emerald-200">
+                {"\u2192"} <span className="font-medium">{suggestion}</span>
+              </p>
+            ))}
+          </div>
         </div>
       </form>
     </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useSpring, useTransform, type MotionValue } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
+import { useRef, useState } from "react";
 import type { WindowId } from "@/store/useWindowStore";
 
 type DockIconProps = {
@@ -9,11 +10,7 @@ type DockIconProps = {
   label: string;
   Icon: LucideIcon;
   accentClass: string;
-  scale: number;
-  offsetY: number;
-  isHovered: boolean;
-  onHoverStart: () => void;
-  onHoverEnd: () => void;
+  mouseX: MotionValue<number>;
   onOpen: (id: WindowId, title: string) => void;
 };
 
@@ -22,47 +19,97 @@ export default function DockIcon({
   label,
   Icon,
   accentClass,
-  scale,
-  offsetY,
-  isHovered,
-  onHoverStart,
-  onHoverEnd,
+  mouseX,
   onOpen,
 }: DockIconProps) {
+  const iconRef = useRef<HTMLButtonElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const distance = useTransform(mouseX, (value) => {
+    if (!Number.isFinite(value)) {
+      return 300;
+    }
+
+    const bounds = iconRef.current?.getBoundingClientRect();
+    if (!bounds) {
+      return 300;
+    }
+
+    return Math.abs(value - (bounds.left + bounds.width / 2));
+  });
+
+  const rawScale = useTransform(distance, [0, 80, 170], [1.46, 1.2, 1]);
+  const rawY = useTransform(distance, [0, 80, 170], [-14, -7, 0]);
+
+  const scale = useSpring(rawScale, { stiffness: 340, damping: 28, mass: 0.5 });
+  const y = useSpring(rawY, { stiffness: 340, damping: 28, mass: 0.5 });
+
   const handleClick = () => {
     onOpen(id, label);
   };
 
   return (
     <motion.button
+      ref={iconRef}
       type="button"
       onClick={handleClick}
       aria-label={label}
-      onHoverStart={onHoverStart}
-      onHoverEnd={onHoverEnd}
-      animate={{
-        scale,
-        y: offsetY,
-      }}
-      whileTap={{ scale: Math.max(0.9, scale - 0.2) }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="group relative flex h-14 w-14 items-center justify-center rounded-2xl"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      style={{ scale, y }}
+      whileTap={{ scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 420, damping: 22 }}
+      className="group relative flex h-14 w-14 transform-gpu items-center justify-center will-change-transform"
     >
-      <span
-        className={`absolute inset-0 rounded-2xl border border-white/20 bg-gradient-to-br ${accentClass} transition duration-300 ${
-          isHovered
-            ? "shadow-[0_10px_25px_rgba(34,211,238,0.3)]"
-            : "shadow-md shadow-black/30"
-        }`}
+      <motion.span
+        className={`absolute inset-0 rounded-[20px] bg-gradient-to-br ${accentClass} blur-xl`}
+        animate={{ opacity: isHovered ? 0.68 : 0.28, scale: isHovered ? 1.32 : 1.02 }}
+        transition={{ duration: 0.3 }}
       />
-      <Icon size={24} className="relative z-10 text-white" strokeWidth={2.3} />
-      <span
-        className={`pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2 rounded-md bg-black/70 px-2 py-1 text-[10px] tracking-wide text-white backdrop-blur-sm transition ${
-          isHovered ? "opacity-100" : "opacity-0"
-        }`}
+
+      <motion.span
+        className={`absolute inset-0 rounded-[20px] border bg-gradient-to-br ${accentClass}`}
+        animate={{
+          borderColor: isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.24)",
+          boxShadow: isHovered
+            ? "0 14px 34px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.42)"
+            : "0 8px 20px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+        }}
+        transition={{ duration: 0.25 }}
+      />
+
+      <motion.span
+        className="absolute inset-0 rounded-[20px]"
+        animate={{
+          background: isHovered
+            ? "linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)"
+            : "rgba(255,255,255,0)",
+        }}
+        transition={{ duration: 0.25 }}
+      />
+
+      <Icon
+        size={26}
+        className="relative z-10 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
+        strokeWidth={2.3}
+      />
+
+      <motion.span
+        initial={{ opacity: 0, y: -2 }}
+        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : -2 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="pointer-events-none absolute -bottom-10 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/15 bg-black/85 px-3 py-1.5 text-[11px] font-medium tracking-wide text-white/95 shadow-lg backdrop-blur-xl"
       >
-        {label}
-      </span>
+        <span className="drop-shadow-sm">{label}</span>
+        <span className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-l border-t border-white/15 bg-black/85" />
+      </motion.span>
+
+      <motion.span
+        className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-white/70"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: isHovered ? 1 : 0, opacity: isHovered ? 0.82 : 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      />
     </motion.button>
   );
 }

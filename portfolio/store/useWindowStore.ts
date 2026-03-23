@@ -2,7 +2,18 @@
 
 import { create } from "zustand";
 
-export type WindowId = "about" | "projects" | "skills" | "contact" | "terminal";
+export type WindowId =
+  | "about"
+  | "education"
+  | "certificates"
+  | "projects"
+  | "skills"
+  | "resume"
+  | "github"
+  | "linkedin"
+  | "achievements"
+  | "contact"
+  | "terminal";
 
 export type WindowItem = {
   id: WindowId;
