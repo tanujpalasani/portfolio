@@ -109,7 +109,7 @@ Architectural pattern:
 - `DesktopIcon` and `DockIcon`: common open-window trigger semantics with different presentation.
 - `ProjectCard`: project display card with stack chips + external link.
 - `SkillBadge`: small reusable tag component.
-- `devos-apps.ts`: central app registry (`id`, label, icon, gradient style), consumed by both desktop and dock.
+- `tanuos-apps.ts`: central app registry (`id`, label, icon, gradient style), consumed by both desktop and dock.
 
 ---
 

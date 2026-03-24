@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import DesktopIcon from "./DesktopIcon";
-import { devOSApps } from "./devos-apps";
+import { tanuOSApps } from "./tanuos-apps";
 import { useWindowStore } from "@/store/useWindowStore";
 
-const SYSTEM_LINES = ["SYSTEM ACTIVE", "DEVOS v1.0", "USER: TANUJ"];
+const SYSTEM_LINES = ["SYSTEM ACTIVE", "TANUOS v1.0", "USER: TANUJ"];
 
 function sleep(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -148,7 +148,17 @@ export default function Desktop() {
     [now],
   );
 
-  const isIconActive = (id: (typeof devOSApps)[number]["id"]) =>
+  const systemStatus = useMemo(() => {
+    const labels = [
+      "All systems operational",
+      "Runtime stable",
+      "Pipelines synchronized",
+      "Network secure",
+    ];
+    return labels[now.getSeconds() % labels.length];
+  }, [now]);
+
+  const isIconActive = (id: (typeof tanuOSApps)[number]["id"]) =>
     windows.some((windowItem) => windowItem.id === id && !windowItem.isMinimized && !windowItem.isClosing);
 
   return (
@@ -198,7 +208,7 @@ export default function Desktop() {
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="h-1.5 w-1.5 rounded-full bg-cyan-300"
             />
-            <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">DevOS</span>
+            <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">TanuOS</span>
           </motion.div>
 
           <motion.div
@@ -232,22 +242,38 @@ export default function Desktop() {
       </motion.div>
 
       <div ref={systemTextRef} className="pointer-events-none absolute inset-0 transform-gpu will-change-transform">
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-[2px]">
-          <div className="space-y-1.5 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-white/24 sm:text-xs">
-          {typedLines.map((line, index) => (
-            <p key={SYSTEM_LINES[index]}>
-              {`> ${line}`}
-              {index === activeLine && (
-                <motion.span
-                  className="ml-0.5 inline-block text-white/25"
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
-                >
-                  _
-                </motion.span>
-              )}
-            </p>
-          ))}
+        <div className="absolute left-1/2 top-1/2 w-[min(92vw,460px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-cyan-100/15 bg-black/25 p-4 shadow-[0_26px_90px_rgba(2,6,23,0.52),0_0_30px_rgba(59,130,246,0.14)] backdrop-blur-xl sm:p-5">
+          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.08] via-transparent to-transparent" />
+
+          <div className="relative flex items-center justify-between border-b border-white/10 pb-2.5 text-[10px] uppercase tracking-[0.16em] text-cyan-100/75">
+            <span>Live System Widget</span>
+            <span suppressHydrationWarning>{timeLabel}</span>
+          </div>
+
+          <div className="relative mt-3.5 grid grid-cols-2 gap-3 text-[11px] uppercase tracking-[0.14em] text-slate-200/75">
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">System Active</div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">TanuOS v1.0</div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">User: Tanuj</div>
+            <div className="rounded-lg border border-emerald-300/25 bg-emerald-400/10 px-3 py-2 text-emerald-100">
+              {systemStatus}
+            </div>
+          </div>
+
+          <div className="relative mt-3.5 space-y-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-cyan-100/60 sm:text-xs">
+            {typedLines.map((line, index) => (
+              <p key={SYSTEM_LINES[index]}>
+                {`> ${line}`}
+                {index === activeLine && (
+                  <motion.span
+                    className="ml-0.5 inline-block text-cyan-100/70"
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
+                  >
+                    _
+                  </motion.span>
+                )}
+              </p>
+            ))}
           </div>
         </div>
       </div>
@@ -262,7 +288,7 @@ export default function Desktop() {
           ref={iconParallaxRef}
           className="flex max-h-[calc(100vh-12rem)] w-[min(340px,calc(100vw-2rem))] transform-gpu flex-col flex-wrap content-start gap-x-3 gap-y-4 overflow-hidden pr-2 will-change-transform sm:max-h-[calc(100vh-14rem)] sm:gap-x-4"
         >
-          {devOSApps.map((app, index) => (
+          {tanuOSApps.map((app, index) => (
             <motion.div
               key={app.id}
               className="w-[92px] shrink-0 sm:w-[100px]"
@@ -270,18 +296,29 @@ export default function Desktop() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4 + index * 0.05, type: "spring", stiffness: 260, damping: 24 }}
             >
-              <DesktopIcon
-                id={app.id}
-                label={app.label}
-                Icon={app.icon}
-                accentClass={app.accentClass}
-                isActive={isIconActive(app.id) || activeWindowId === app.id}
-                onOpen={openWindow}
-              />
+              <motion.div
+                animate={{ y: [0, -1.8, 0] }}
+                transition={{ duration: 3.2 + (index % 3) * 0.6, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <DesktopIcon
+                  id={app.id}
+                  label={app.label}
+                  Icon={app.icon}
+                  accentClass={app.accentClass}
+                  isActive={isIconActive(app.id) || activeWindowId === app.id}
+                  onOpen={openWindow}
+                />
+              </motion.div>
             </motion.div>
           ))}
         </div>
       </motion.aside>
+
+      <motion.div
+        className="pointer-events-none absolute bottom-0 left-1/2 z-10 h-48 w-[min(94vw,920px)] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.22)_0%,rgba(59,130,246,0.14)_36%,rgba(147,51,234,0.08)_58%,transparent_78%)] blur-3xl"
+        animate={{ opacity: [0.32, 0.72, 0.32], scale: [0.95, 1.06, 0.95] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <motion.div
         initial={{ y: 40, opacity: 0 }}

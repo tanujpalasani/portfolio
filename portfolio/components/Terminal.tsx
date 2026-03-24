@@ -92,7 +92,7 @@ function getResponse(command: string): CommandResponse {
     case "hello":
       return {
         kind: "success",
-        lines: ["Hey there. Thanks for exploring my DevOS terminal."],
+        lines: ["Hey there. Thanks for exploring my TanuOS terminal."],
       };
     case "sudo hire-me":
       return {
@@ -204,7 +204,7 @@ export default function Terminal() {
 
     const token = streamTokenRef.current;
     const bootLines = [
-      "DevOS Booting...",
+      "TanuOS Booting...",
       "Loading modules...",
       "Initializing system...",
       "Ready.",
@@ -347,7 +347,7 @@ export default function Terminal() {
     () => (
       <span className="select-none">
         <span className="text-emerald-300 drop-shadow-[0_0_6px_rgba(74,222,128,0.7)]">{"\u279C"}</span>{" "}
-        <span className="text-cyan-300">devos</span> <span className="text-slate-400">~</span>{" "}
+        <span className="text-cyan-300">tanuos</span> <span className="text-slate-400">~</span>{" "}
         <span className="text-slate-200">%</span>
       </span>
     ),
@@ -366,7 +366,7 @@ export default function Terminal() {
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
             <span className="text-[11px] font-medium tracking-wide text-emerald-300/80">terminal session</span>
           </div>
-          <div className="text-[10px] tracking-wide text-emerald-400/60">DevOS v1.0</div>
+          <div className="text-[10px] tracking-wide text-emerald-400/60">TanuOS v1.0</div>
         </div>
         {/* Animated line */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />

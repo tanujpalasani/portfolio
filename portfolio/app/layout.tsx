@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DevOS Portfolio",
+  title: "TanuOS Portfolio",
   description: "A macOS-inspired portfolio desktop built with Next.js",
 };
 

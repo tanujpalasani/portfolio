@@ -3,6 +3,18 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 
+const PARTICLES = [
+  { left: "8%", top: "22%", delay: 0, duration: 14, size: 2 },
+  { left: "18%", top: "66%", delay: 1.2, duration: 18, size: 1.8 },
+  { left: "27%", top: "38%", delay: 0.8, duration: 16, size: 1.6 },
+  { left: "36%", top: "72%", delay: 1.7, duration: 17, size: 2.2 },
+  { left: "46%", top: "18%", delay: 0.5, duration: 15, size: 2 },
+  { left: "58%", top: "56%", delay: 2.1, duration: 19, size: 1.7 },
+  { left: "67%", top: "30%", delay: 0.9, duration: 16, size: 1.9 },
+  { left: "74%", top: "74%", delay: 1.4, duration: 18, size: 2 },
+  { left: "86%", top: "44%", delay: 0.2, duration: 15, size: 1.6 },
+];
+
 export default function DesktopBackground() {
   const backgroundRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -57,7 +69,32 @@ export default function DesktopBackground() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       {/* Background layer */}
       <div ref={backgroundRef} className="absolute inset-[-4%] transform-gpu will-change-transform">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_92%,rgba(59,130,246,0.18)_0%,rgba(56,189,248,0.08)_18%,transparent_48%),linear-gradient(160deg,#020617_0%,#020617_60%,#0f172a_100%)]" />
+        <motion.div
+          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_92%,rgba(59,130,246,0.2)_0%,rgba(56,189,248,0.1)_18%,transparent_48%),linear-gradient(160deg,#020617_0%,#020617_52%,#111827_100%)]"
+          animate={{
+            filter: ["hue-rotate(0deg)", "hue-rotate(12deg)", "hue-rotate(0deg)"],
+            scale: [1, 1.02, 1],
+          }}
+          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <motion.div
+          className="absolute left-[10%] top-[8%] h-44 w-44 rounded-full bg-cyan-400/18 blur-[90px]"
+          animate={{ x: [0, 36, 0], y: [0, 24, 0], opacity: [0.24, 0.4, 0.24] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <motion.div
+          className="absolute right-[12%] top-[26%] h-52 w-52 rounded-full bg-indigo-400/16 blur-[100px]"
+          animate={{ x: [0, -32, 0], y: [0, 26, 0], opacity: [0.22, 0.38, 0.22] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <motion.div
+          className="absolute left-[42%] bottom-[14%] h-60 w-60 rounded-full bg-violet-400/14 blur-[110px]"
+          animate={{ x: [0, 20, 0], y: [0, -18, 0], opacity: [0.2, 0.34, 0.2] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        />
 
         <motion.div
           className="absolute left-1/2 bottom-[-18rem] h-[42rem] w-[42rem] -translate-x-1/2 rounded-full blur-3xl"
@@ -120,6 +157,31 @@ export default function DesktopBackground() {
         <div className="absolute left-[18%] bottom-[34%] h-10 w-px bg-gradient-to-t from-cyan-200/12 to-transparent" />
         <div className="absolute right-[12%] bottom-[30%] h-px w-[12rem] bg-gradient-to-r from-fuchsia-300/0 via-fuchsia-200/12 to-fuchsia-300/0" />
         <div className="absolute right-[22%] bottom-[30%] h-8 w-px bg-gradient-to-t from-fuchsia-200/12 to-transparent" />
+
+        {PARTICLES.map((particle, index) => (
+          <motion.span
+            key={`${particle.left}-${particle.top}`}
+            className="absolute rounded-full bg-cyan-100/70"
+            style={{
+              left: particle.left,
+              top: particle.top,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              boxShadow: "0 0 8px rgba(103, 232, 249, 0.6)",
+            }}
+            animate={{
+              y: [0, -12, 0],
+              opacity: [0.25, 0.8, 0.25],
+              scale: [0.92, 1.12, 0.92],
+            }}
+            transition={{
+              duration: particle.duration,
+              delay: particle.delay,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
       {/* Dock-side dual glow */}

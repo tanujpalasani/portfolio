@@ -1,4 +1,4 @@
-# DevOS Portfolio
+# TanuOS Portfolio
 
 Portfolio project built with Next.js App Router, Tailwind CSS, Framer Motion, and Lucide icons.
 

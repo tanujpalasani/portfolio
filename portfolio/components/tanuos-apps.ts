@@ -14,19 +14,31 @@ import {
 } from "lucide-react";
 import type { WindowId } from "@/store/useWindowStore";
 
-export type DevOSApp = {
+export type TanuOSApp = {
   id: WindowId;
   label: string;
   icon: LucideIcon;
   accentClass: string;
 };
 
-export const devOSApps: DevOSApp[] = [
+export const tanuOSApps: TanuOSApp[] = [
   {
     id: "about",
     label: "About",
     icon: UserRound,
     accentClass: "from-cyan-300/90 to-sky-500/90",
+  },
+  {
+    id: "skills",
+    label: "Skills",
+    icon: Sparkles,
+    accentClass: "from-fuchsia-300/90 to-indigo-500/90",
+  },
+  {
+    id: "projects",
+    label: "Projects",
+    icon: FolderKanban,
+    accentClass: "from-emerald-300/90 to-teal-500/90",
   },
   {
     id: "education",
@@ -41,16 +53,10 @@ export const devOSApps: DevOSApp[] = [
     accentClass: "from-emerald-300/90 to-cyan-500/90",
   },
   {
-    id: "projects",
-    label: "Projects",
-    icon: FolderKanban,
-    accentClass: "from-emerald-300/90 to-teal-500/90",
-  },
-  {
-    id: "skills",
-    label: "Skills",
-    icon: Sparkles,
-    accentClass: "from-fuchsia-300/90 to-indigo-500/90",
+    id: "achievements",
+    label: "Achievements",
+    icon: Trophy,
+    accentClass: "from-amber-300/90 to-orange-500/90",
   },
   {
     id: "resume",
@@ -69,12 +75,6 @@ export const devOSApps: DevOSApp[] = [
     label: "LinkedIn",
     icon: Linkedin,
     accentClass: "from-cyan-300/90 to-blue-500/90",
-  },
-  {
-    id: "achievements",
-    label: "Achievements",
-    icon: Trophy,
-    accentClass: "from-amber-300/90 to-orange-500/90",
   },
   {
     id: "contact",

@@ -27,7 +27,7 @@ type CommandContext = {
 };
 
 const BOOT_LINES = [
-  "Booting DevOS v1.0...",
+  "Booting TanuOS v1.0...",
   "Loading modules...",
   "Initializing profile...",
   "System ready.",
@@ -187,7 +187,7 @@ function createCommandResult(command: string, context: CommandContext): CommandR
         kind: "output",
         lines: [
           "SYSTEM STATUS:",
-          `User: ${portfolio.personal.shortName.toLowerCase()}@devos`,
+          `User: ${portfolio.personal.shortName.toLowerCase()}@tanuos`,
           "Core modules: online",
           "Uptime: stable",
           `Focus: ${portfolio.skills.coreStack.slice(0, 3).join(" + ")}`,
@@ -196,7 +196,7 @@ function createCommandResult(command: string, context: CommandContext): CommandR
     case "hello":
       return {
         kind: "success",
-        lines: ["Hello, human. DevOS terminal is online and ready."],
+        lines: ["Hello, human. TanuOS terminal is online and ready."],
       };
     default:
       return {
@@ -226,7 +226,7 @@ export default function TerminalWindow() {
     () => (
       <span className="select-none">
         <span className="text-emerald-300 drop-shadow-[0_0_6px_rgba(74,222,128,0.7)]">➜</span>{" "}
-        <span className="text-cyan-300">devos</span> <span className="text-slate-400">~</span>{" "}
+        <span className="text-cyan-300">tanuos</span> <span className="text-slate-400">~</span>{" "}
         <span className="text-slate-100">%</span>
       </span>
     ),
@@ -441,12 +441,12 @@ export default function TerminalWindow() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
-            <span className="text-[11px] uppercase tracking-[0.14em] text-emerald-300/85">DevOS Interactive Terminal</span>
+            <span className="text-[11px] uppercase tracking-[0.14em] text-emerald-300/85">TanuOS Interactive Terminal</span>
           </div>
           <span className="text-[10px] tracking-[0.12em] text-cyan-200/65">v1.0</span>
         </div>
         <div className="mt-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.12em] text-slate-300/70">
-          <span>User: tanuj@devos</span>
+          <span>User: tanuj@tanuos</span>
           <span className="text-emerald-300/85">Status: Online</span>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent" />

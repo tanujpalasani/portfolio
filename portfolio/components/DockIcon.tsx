@@ -10,6 +10,7 @@ type DockIconProps = {
   label: string;
   Icon: LucideIcon;
   accentClass: string;
+  isActive: boolean;
   mouseX: MotionValue<number>;
   onOpen: (id: WindowId, title: string) => void;
 };
@@ -19,6 +20,7 @@ export default function DockIcon({
   label,
   Icon,
   accentClass,
+  isActive,
   mouseX,
   onOpen,
 }: DockIconProps) {
@@ -38,8 +40,8 @@ export default function DockIcon({
     return Math.abs(value - (bounds.left + bounds.width / 2));
   });
 
-  const rawScale = useTransform(distance, [0, 80, 170], [1.46, 1.2, 1]);
-  const rawY = useTransform(distance, [0, 80, 170], [-14, -7, 0]);
+  const rawScale = useTransform(distance, [0, 80, 170], [1.62, 1.26, 1]);
+  const rawY = useTransform(distance, [0, 80, 170], [-17, -8, 0]);
 
   const scale = useSpring(rawScale, { stiffness: 340, damping: 28, mass: 0.5 });
   const y = useSpring(rawY, { stiffness: 340, damping: 28, mass: 0.5 });
@@ -62,16 +64,34 @@ export default function DockIcon({
       className="group relative flex h-14 w-14 transform-gpu items-center justify-center will-change-transform"
     >
       <motion.span
+        className="pointer-events-none absolute -bottom-2 left-1/2 h-3.5 w-8 -translate-x-1/2 rounded-full bg-cyan-300/70 blur-[8px]"
+        animate={{
+          opacity: isActive ? [0.65, 1, 0.65] : isHovered ? 0.6 : 0,
+          scale: isActive ? [0.9, 1.15, 0.9] : isHovered ? 1 : 0.7,
+        }}
+        transition={{ duration: 1.8, repeat: isActive ? Infinity : 0, ease: "easeInOut" }}
+      />
+
+      <motion.span
         className={`absolute inset-0 rounded-[20px] bg-gradient-to-br ${accentClass} blur-xl`}
-        animate={{ opacity: isHovered ? 0.68 : 0.28, scale: isHovered ? 1.32 : 1.02 }}
+        animate={{
+          opacity: isActive ? 0.82 : isHovered ? 0.72 : 0.28,
+          scale: isActive ? 1.4 : isHovered ? 1.32 : 1.02,
+        }}
         transition={{ duration: 0.3 }}
       />
 
       <motion.span
         className={`absolute inset-0 rounded-[20px] border bg-gradient-to-br ${accentClass}`}
         animate={{
-          borderColor: isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.24)",
-          boxShadow: isHovered
+          borderColor: isActive
+            ? "rgba(186, 230, 253, 0.75)"
+            : isHovered
+              ? "rgba(255, 255, 255, 0.38)"
+              : "rgba(255, 255, 255, 0.24)",
+          boxShadow: isActive
+            ? "0 16px 36px rgba(0, 0, 0, 0.55), 0 0 22px rgba(56,189,248,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5)"
+            : isHovered
             ? "0 14px 34px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.42)"
             : "0 8px 20px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
         }}
@@ -105,9 +125,9 @@ export default function DockIcon({
       </motion.span>
 
       <motion.span
-        className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-white/70"
+        className="absolute -bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-cyan-100"
         initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: isHovered ? 1 : 0, opacity: isHovered ? 0.82 : 0 }}
+        animate={{ scale: isActive ? 1 : isHovered ? 0.85 : 0, opacity: isActive ? 1 : isHovered ? 0.82 : 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 20 }}
       />
     </motion.button>

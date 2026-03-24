@@ -36,15 +36,15 @@ export default function DesktopIcon({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      whileHover={{ scale: 1.05, y: -3, transition: { type: "spring", stiffness: 380, damping: 18 } }}
+      whileHover={{ scale: 1.06, y: -6, transition: { type: "spring", stiffness: 380, damping: 18 } }}
       whileTap={{ scale: 0.96, transition: { type: "spring", stiffness: 400, damping: 17 } }}
       className="group relative flex w-full flex-col items-center gap-2.5 overflow-hidden rounded-2xl p-2.5 text-center transition-colors duration-200 hover:bg-white/5"
     >
       <motion.span
         key={rippleId}
         initial={{ scale: 0, opacity: 0.35 }}
-        animate={{ scale: 2.5, opacity: 0 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
+        animate={{ scale: 3.1, opacity: 0 }}
+        transition={{ duration: 0.52, ease: "easeOut" }}
         className="pointer-events-none absolute left-1/2 top-8 h-10 w-10 -translate-x-1/2 rounded-full bg-cyan-300/30 blur-sm"
       />
 
@@ -63,14 +63,14 @@ export default function DesktopIcon({
         <motion.div
           className={`absolute inset-0 rounded-[18px] bg-gradient-to-br ${accentClass} blur-xl transition-opacity duration-300 ${isActive ? "opacity-75" : "opacity-0 group-hover:opacity-70"}`}
           initial={{ scale: 0.84 }}
-          whileHover={{ scale: 1.2 }}
+          whileHover={{ scale: 1.24 }}
           transition={{ duration: 0.3 }}
         />
 
         <motion.span
           className={`relative flex h-16 w-16 items-center justify-center rounded-[18px] border bg-gradient-to-br ${accentClass} shadow-[0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.4)] transition-all duration-300 group-hover:shadow-[0_12px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.5)] ${
             isActive
-              ? "border-cyan-200/70 ring-2 ring-cyan-300/35"
+              ? "border-cyan-200/80 ring-2 ring-cyan-300/35 shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_24px_rgba(34,211,238,0.35),inset_0_1px_0_rgba(255,255,255,0.5)]"
               : "border-white/25 group-hover:border-white/40"
           }`}
           whileHover={{ scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 17 } }}
@@ -91,6 +91,8 @@ export default function DesktopIcon({
         className={`text-xs font-semibold tracking-[0.02em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] transition-colors duration-200 ${
           isActive ? "text-cyan-100" : "text-white/85 group-hover:text-white"
         }`}
+        animate={{ y: [0, -1.6, 0] }}
+        transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
         style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}
       >
         {label}

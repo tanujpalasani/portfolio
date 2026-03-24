@@ -29,8 +29,14 @@ export type WindowItem = {
   };
 };
 
+export type RecentApp = {
+  id: WindowId;
+  name: string;
+};
+
 type WindowStore = {
   windows: WindowItem[];
+  recentApps: RecentApp[];
   activeWindowId: WindowId | null;
   topZIndex: number;
   openWindow: (id: WindowId, title: string) => void;
@@ -49,6 +55,20 @@ const VERTICAL_MARGIN = 24;
 const WINDOW_OFFSET_STEP = 30;
 const MINIMIZE_ANIMATION_MS = 260;
 const CLOSE_ANIMATION_MS = 180;
+const MAX_RECENT_DOCK_ITEMS = 8;
+
+const DEFAULT_RECENT_APPS: RecentApp[] = [
+  { id: "about", name: "About" },
+  { id: "projects", name: "Projects" },
+  { id: "skills", name: "Skills" },
+  { id: "contact", name: "Contact" },
+  { id: "terminal", name: "Terminal" },
+];
+
+function updateRecentApps(currentApps: RecentApp[], nextApp: RecentApp): RecentApp[] {
+  const withoutCurrent = currentApps.filter((app) => app.id !== nextApp.id);
+  return [nextApp, ...withoutCurrent].slice(0, MAX_RECENT_DOCK_ITEMS);
+}
 
 function getViewportWindowWidth(): number {
   if (typeof window === "undefined") {
@@ -91,12 +111,14 @@ function getInitialPosition(windowCount: number): { x: number; y: number } {
 
 export const useWindowStore = create<WindowStore>((set, get) => ({
   windows: [],
+  recentApps: DEFAULT_RECENT_APPS,
   activeWindowId: null,
   topZIndex: BASE_Z_INDEX,
   openWindow: (id, title) => {
-    const { windows, topZIndex } = get();
+    const { windows, topZIndex, recentApps } = get();
     const nextZIndex = topZIndex + 1;
     const existingWindow = windows.find((windowItem) => windowItem.id === id);
+    const nextRecentApps = updateRecentApps(recentApps, { id, name: title });
 
     if (existingWindow) {
       set({
@@ -111,6 +133,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
               }
             : windowItem,
         ),
+        recentApps: nextRecentApps,
         activeWindowId: id,
         topZIndex: nextZIndex,
       });
@@ -131,6 +154,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
           initialPosition: getInitialPosition(windows.length),
         },
       ],
+      recentApps: nextRecentApps,
       activeWindowId: id,
       topZIndex: nextZIndex,
     });
