@@ -2,7 +2,6 @@
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import {
-  BadgeCheck,
   Bot,
   Brain,
   Code2,

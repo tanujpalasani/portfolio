@@ -158,8 +158,17 @@ export default function Desktop() {
     return labels[now.getSeconds() % labels.length];
   }, [now]);
 
-  const isIconActive = (id: (typeof tanuOSApps)[number]["id"]) =>
-    windows.some((windowItem) => windowItem.id === id && !windowItem.isMinimized && !windowItem.isClosing);
+  const visibleWindowIds = useMemo(
+    () =>
+      new Set(
+        windows
+          .filter((windowItem) => !windowItem.isMinimized && !windowItem.isClosing)
+          .map((windowItem) => windowItem.id),
+      ),
+    [windows],
+  );
+
+  const isIconActive = (id: (typeof tanuOSApps)[number]["id"]) => visibleWindowIds.has(id);
 
   return (
     <section className="pointer-events-none absolute inset-0 z-20">

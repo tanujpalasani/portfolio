@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Draggable from "react-draggable";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 
 import type { WindowId } from "@/store/useWindowStore";
 
@@ -25,7 +25,7 @@ type WindowProps = {
   onFocus: (id: WindowId) => void;
 };
 
-export default function Window({
+function WindowComponent({
   id,
   title,
   zIndex,
@@ -198,3 +198,8 @@ export default function Window({
     </Draggable>
   );
 }
+
+const Window = memo(WindowComponent);
+Window.displayName = "Window";
+
+export default Window;

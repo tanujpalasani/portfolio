@@ -158,7 +158,7 @@ export default function DesktopBackground() {
         <div className="absolute right-[12%] bottom-[30%] h-px w-[12rem] bg-gradient-to-r from-fuchsia-300/0 via-fuchsia-200/12 to-fuchsia-300/0" />
         <div className="absolute right-[22%] bottom-[30%] h-8 w-px bg-gradient-to-t from-fuchsia-200/12 to-transparent" />
 
-        {PARTICLES.map((particle, index) => (
+        {PARTICLES.map((particle) => (
           <motion.span
             key={`${particle.left}-${particle.top}`}
             className="absolute rounded-full bg-cyan-100/70"
