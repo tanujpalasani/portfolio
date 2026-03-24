@@ -141,6 +141,7 @@ export default function SkillsWindow() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [rippleNodeId, setRippleNodeId] = useState<string | null>(null);
   const [rippleSeed, setRippleSeed] = useState(0);
+  const [scanSeed, setScanSeed] = useState(0);
   const [typedLogs, setTypedLogs] = useState<string[]>([]);
   const logsRunRef = useRef(0);
 
@@ -175,10 +176,10 @@ export default function SkillsWindow() {
 
   const activeLogs = useMemo(
     () => [
-      `[ INFO ] Inspecting module: ${selected.name}`,
-      `[ OK ] Status => ${selected.status}`,
-      `[ OK ] Readiness synced (${selected.confidence}%)`,
-      `[ OK ] Capabilities loaded (${selected.capabilities.length})`,
+      `[ INFO ] Switching module: ${selected.name}`,
+      `[ INFO ] Loading capabilities...`,
+      `[ OK ] Status: ${selected.status}`,
+      `[ OK ] Confidence synced`,
     ],
     [selected],
   );
@@ -263,6 +264,14 @@ export default function SkillsWindow() {
 
             <div className="relative h-[320px] p-4">
               <motion.div
+                key={scanSeed}
+                className="pointer-events-none absolute inset-x-4 top-0 h-12 bg-gradient-to-b from-cyan-200/18 via-cyan-300/10 to-transparent"
+                initial={{ y: 0, opacity: 0.08 }}
+                animate={{ y: 268, opacity: [0.08, 0.4, 0.08] }}
+                transition={{ duration: 0.65, ease: "easeOut" }}
+              />
+
+              <motion.div
                 className="pointer-events-none absolute inset-x-4 top-0 h-12 bg-gradient-to-b from-cyan-300/12 to-transparent"
                 animate={{ y: [0, 268, 0], opacity: [0.2, 0.42, 0.2] }}
                 transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
@@ -273,6 +282,16 @@ export default function SkillsWindow() {
               </p>
 
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <defs>
+                  <filter id="scannerEdgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1.2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
                 {edges.map(({ from, to, key }) => {
                   const active =
                     (hoveredId && (hoveredId === from.id || hoveredId === to.id)) ||
@@ -281,21 +300,50 @@ export default function SkillsWindow() {
                   const selectedEdge = selectedId === from.id || selectedId === to.id;
 
                   return (
-                    <motion.line
-                      key={`${key}-${selectedEdge ? "active" : "idle"}`}
-                      x1={from.node.x}
-                      y1={from.node.y}
-                      x2={to.node.x}
-                      y2={to.node.y}
-                      initial={selectedEdge ? { pathLength: 0.2, opacity: 0.2 } : false}
-                      animate={{
-                        pathLength: selectedEdge ? 1 : 0.9,
-                        opacity: active ? 0.9 : 0.35,
-                      }}
-                      transition={{ duration: selectedEdge ? 0.45 : 0.2, ease: "easeOut" }}
-                      stroke={active ? "rgba(103,232,249,0.78)" : "rgba(148,163,184,0.3)"}
-                      strokeWidth={active ? 1.2 : 0.85}
-                    />
+                    <g key={key}>
+                      <motion.line
+                        x1={from.node.x}
+                        y1={from.node.y}
+                        x2={to.node.x}
+                        y2={to.node.y}
+                        animate={{
+                          opacity: active ? [0.6, 0.82, 0.6] : [0.24, 0.32, 0.24],
+                        }}
+                        transition={{ duration: active ? 1.8 : 2.4, ease: "easeInOut", repeat: Infinity }}
+                        stroke={active ? "rgba(103,232,249,0.58)" : "rgba(148,163,184,0.24)"}
+                        strokeWidth={active ? 1.16 : 0.82}
+                        filter={active ? "url(#scannerEdgeGlow)" : undefined}
+                      />
+
+                      {selectedEdge && (
+                        <>
+                          <motion.line
+                            x1={from.node.x}
+                            y1={from.node.y}
+                            x2={to.node.x}
+                            y2={to.node.y}
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1, opacity: [0.35, 0.9, 0.35] }}
+                            transition={{ duration: 1.25, ease: "easeInOut" }}
+                            stroke="rgba(125,211,252,0.9)"
+                            strokeWidth={1.24}
+                            strokeLinecap="round"
+                          />
+
+                          <motion.circle
+                            r={0.85}
+                            fill="rgba(186,230,253,0.95)"
+                            filter="url(#scannerEdgeGlow)"
+                            animate={{
+                              cx: [from.node.x, to.node.x],
+                              cy: [from.node.y, to.node.y],
+                              opacity: [0, 1, 1, 0],
+                            }}
+                            transition={{ duration: 1.45, repeat: Infinity, ease: "easeInOut" }}
+                          />
+                        </>
+                      )}
+                    </g>
                   );
                 })}
               </svg>
@@ -308,62 +356,72 @@ export default function SkillsWindow() {
                   (selectedId && isRelated(selectedId, module.id));
 
                 return (
-                  <motion.button
+                  <div
                     key={module.id}
-                    type="button"
-                    onMouseEnter={() => setHoveredId(module.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => {
-                      setSelectedId(module.id);
-                      setRippleNodeId(module.id);
-                      setRippleSeed((prev) => prev + 1);
-                    }}
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: selectedNode ? 1.2 : hoveredNode ? 1.08 : 1 }}
-                    transition={{
-                      opacity: { delay: 0.12 + index * 0.035, duration: 0.26 },
-                      scale: { duration: 0.2 },
-                    }}
-                    className="group absolute -translate-x-1/2 -translate-y-1/2 transform-gpu"
+                    className="absolute"
                     style={{ left: `${module.node.x}%`, top: `${module.node.y}%` }}
                   >
-                    <motion.span
-                      animate={{
-                        boxShadow: selectedNode || hoveredNode || related
-                          ? "0 0 24px rgba(34,211,238,0.72)"
-                          : "0 0 0px rgba(34,211,238,0)",
-                      }}
-                      transition={{ duration: 0.22 }}
-                      className={`relative flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-sm ${
-                        selectedNode
-                          ? "border-cyan-200/85 bg-cyan-300/32"
-                          : hoveredNode || related
-                            ? "border-cyan-200/52 bg-cyan-300/18"
-                            : "border-white/18 bg-white/[0.06]"
-                      }`}
-                    >
-                      <motion.span
-                        animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.9, 0.5] }}
-                        transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 rounded-full bg-cyan-300/10"
-                      />
-
-                      {rippleNodeId === module.id && (
+                    <div className="-translate-x-1/2 -translate-y-1/2">
+                      <motion.button
+                        type="button"
+                        onMouseEnter={() => setHoveredId(module.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        onClick={() => {
+                          setSelectedId(module.id);
+                          setRippleNodeId(module.id);
+                          setRippleSeed((prev) => prev + 1);
+                          setScanSeed((prev) => prev + 1);
+                        }}
+                        initial={{ opacity: 0, scale: 0.7 }}
+                        animate={{
+                          opacity: 1,
+                          scale: selectedNode ? 1.26 : hoveredNode ? 1.1 : 1,
+                        }}
+                        transition={{
+                          opacity: { delay: 0.12 + index * 0.035, duration: 0.26 },
+                          scale: { type: "spring", stiffness: 360, damping: 22 },
+                        }}
+                        className="group relative transform-gpu"
+                      >
                         <motion.span
-                          key={`${module.id}-${rippleSeed}`}
-                          initial={{ scale: 0.2, opacity: 0.5 }}
-                          animate={{ scale: 2.1, opacity: 0 }}
-                          transition={{ duration: 0.42, ease: "easeOut" }}
-                          className="pointer-events-none absolute inset-0 rounded-full border border-cyan-200/70"
-                        />
-                      )}
+                          animate={{
+                            boxShadow: selectedNode || hoveredNode || related
+                              ? "0 0 30px rgba(34,211,238,0.86)"
+                              : "0 0 0px rgba(34,211,238,0)",
+                          }}
+                          transition={{ duration: 0.22 }}
+                          className={`relative flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-sm ${
+                            selectedNode
+                              ? "border-cyan-100/95 bg-cyan-300/38"
+                              : hoveredNode || related
+                                ? "border-cyan-200/52 bg-cyan-300/18"
+                                : "border-white/18 bg-white/[0.06]"
+                          }`}
+                        >
+                          <motion.span
+                            animate={{ scale: [1, 1.14, 1], opacity: selectedNode ? [0.65, 1, 0.65] : [0.38, 0.75, 0.38] }}
+                            transition={{ duration: selectedNode ? 1.8 : 2.4, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 rounded-full bg-cyan-300/10"
+                          />
 
-                      <module.icon size={15} className="relative z-10 text-cyan-100" />
-                    </motion.span>
-                    <span className="pointer-events-none absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">
-                      {module.name}
-                    </span>
-                  </motion.button>
+                          {rippleNodeId === module.id && (
+                            <motion.span
+                              key={`${module.id}-${rippleSeed}`}
+                              initial={{ scale: 0.2, opacity: 0.5 }}
+                              animate={{ scale: 2.1, opacity: 0 }}
+                              transition={{ duration: 0.42, ease: "easeOut" }}
+                              className="pointer-events-none absolute inset-0 rounded-full border border-cyan-200/70"
+                            />
+                          )}
+
+                          <module.icon size={15} className="relative z-10 text-cyan-100" />
+                        </motion.span>
+                        <span className="pointer-events-none absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">
+                          {module.name}
+                        </span>
+                      </motion.button>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -374,59 +432,67 @@ export default function SkillsWindow() {
               <GitBranch size={12} /> Skill Details
             </div>
 
-            <motion.div
-              key={selected.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.26 }}
-              className="space-y-4"
-            >
-              <div className="flex items-center gap-2">
-                <div className="rounded-lg border border-cyan-200/25 bg-cyan-300/12 p-2 text-cyan-100">
-                  <selected.icon size={16} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{selected.name}</h3>
-                  <p className="text-xs text-slate-300/75">Experience: {selected.years}</p>
-                </div>
-              </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selected.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.28, ease: "easeOut" }}
+                className="space-y-4"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/80">
+                  {`[ ANALYZING MODULE: ${selected.name.toUpperCase()} ]`}
+                </p>
 
-              <div className="grid gap-2 sm:grid-cols-2">
-                <div className="rounded-lg border border-white/12 bg-black/20 p-2.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Status</p>
-                  <p className="mt-1 text-sm font-medium text-cyan-100">{selected.status}</p>
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg border border-cyan-200/25 bg-cyan-300/12 p-2 text-cyan-100">
+                    <selected.icon size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{selected.name}</h3>
+                    <p className="text-xs text-slate-300/75">Experience: {selected.years}</p>
+                  </div>
                 </div>
-                <div className="rounded-lg border border-white/12 bg-black/20 p-2.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Confidence</p>
-                  <p className="mt-1 text-sm font-medium text-cyan-100">{selected.confidence}%</p>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <div className="relative h-2 overflow-hidden rounded-full bg-white/10">
-                  <motion.div
-                    key={selected.id}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${selected.confidence}%` }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-blue-300 to-violet-300 shadow-[0_0_12px_rgba(56,189,248,0.6)]"
-                  />
-                  <motion.span
-                    className="pointer-events-none absolute inset-y-0 w-8 bg-gradient-to-r from-transparent via-white/45 to-transparent"
-                    animate={{ x: ["-60%", "260%"] }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
-                  />
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="rounded-lg border border-white/12 bg-black/20 p-2.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Status</p>
+                    <p className="mt-1 text-sm font-medium text-cyan-100">{selected.status}</p>
+                  </div>
+                  <div className="rounded-lg border border-white/12 bg-black/20 p-2.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Confidence</p>
+                    <p className="mt-1 text-sm font-medium text-cyan-100">{selected.confidence}%</p>
+                  </div>
                 </div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/70">Skill Confidence Meter</p>
-              </div>
 
-              <div className="space-y-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Key Capabilities</p>
-                {selected.capabilities.map((item) => (
-                  <p key={item} className="text-sm text-slate-200/88">- {item}</p>
-                ))}
-              </div>
-            </motion.div>
+                <div className="space-y-2">
+                  <div className="relative h-2 overflow-hidden rounded-full bg-white/10">
+                    <motion.div
+                      key={selected.id}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${selected.confidence}%` }}
+                      transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-blue-300 to-violet-300"
+                      style={{ boxShadow: `0 0 ${Math.max(10, Math.floor(selected.confidence / 6))}px rgba(56,189,248,0.68)` }}
+                    />
+                    <motion.span
+                      className="pointer-events-none absolute inset-y-0 w-8 bg-gradient-to-r from-transparent via-white/45 to-transparent"
+                      animate={{ x: ["-60%", "260%"] }}
+                      transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300/70">Skill Confidence Meter</p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Key Capabilities</p>
+                  {selected.capabilities.map((item) => (
+                    <p key={item} className="text-sm text-slate-200/88">- {item}</p>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </section>
         </div>
 
@@ -447,10 +513,11 @@ export default function SkillsWindow() {
               >
                 {activeLogs.map((line, index) => {
                   const rendered = typedLogs[index] ?? "";
+                  const isLastVisibleLine = index === Math.max(typedLogs.length - 1, activeLogs.length - 1);
                   return (
                     <p key={`${line}-${index}`} className={severityClass(line)}>
                       {rendered}
-                      {index === typedLogs.length - 1 && rendered.length < line.length ? (
+                      {isLastVisibleLine ? (
                         <motion.span
                           animate={{ opacity: [1, 0, 1] }}
                           transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}

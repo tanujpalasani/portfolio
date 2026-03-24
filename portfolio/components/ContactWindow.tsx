@@ -45,11 +45,10 @@ const IDLE_LOGS = [
 ];
 
 const SEND_LOGS = [
-  "[ INIT ] Establishing connection...",
-  "[ OK ] Secure channel created",
-  "[ INFO ] Encrypting payload...",
-  "[ INFO ] Sending message...",
-  "[ DONE ] Message delivered",
+  "[ INIT ] Establishing secure channel...",
+  "[ AUTH ] Encrypting payload...",
+  "[ SEND ] Transmitting packet...",
+  "[ OK ] Delivery confirmed",
 ];
 
 function sleep(ms: number) {
@@ -57,6 +56,9 @@ function sleep(ms: number) {
 }
 
 function getSeverityClass(line: string) {
+  if (line.includes("[ AUTH ]") || line.includes("[ SEND ]")) {
+    return "text-sky-200/92";
+  }
   if (line.includes("[ DONE ]")) {
     return "text-cyan-200/95";
   }
@@ -85,12 +87,22 @@ export default function ContactWindow() {
   const [logScript, setLogScript] = useState<string[]>(IDLE_LOGS);
   const [typedLogs, setTypedLogs] = useState<string[]>([]);
   const [activeLogIndex, setActiveLogIndex] = useState(-1);
+  const [activeField, setActiveField] = useState<"name" | "email" | "message" | null>(null);
 
   const logRunRef = useRef(0);
+  const resetTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setCursorVisible((prev) => !prev), 520);
     return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) {
+        window.clearTimeout(resetTimerRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -160,16 +172,23 @@ export default function ContactWindow() {
 
     await sleep(estimateTypingDuration(SEND_LOGS) + 180);
 
-    setName("");
-    setEmail("");
-    setMessage("");
     setIsSending(false);
     setIsDelivered(true);
 
-    setLogScript([
-      "[ DONE ] Message delivered",
-      "[ OK ] Terminal reset and ready",
-    ]);
+    setLogScript(["[ SUCCESS ] Transmission acknowledged."]);
+
+    if (resetTimerRef.current) {
+      window.clearTimeout(resetTimerRef.current);
+    }
+
+    resetTimerRef.current = window.setTimeout(() => {
+      setName("");
+      setEmail("");
+      setMessage("");
+      setIsDelivered(false);
+      setLogScript(IDLE_LOGS);
+      setActiveField(null);
+    }, 2500);
   };
 
   return (
@@ -206,35 +225,68 @@ export default function ContactWindow() {
               <p className="text-cyan-100/90">&gt; initiate.contact</p>
 
               <label className="block">
-                <span className="text-cyan-200/85">&gt; name:</span>
+                <span className="text-cyan-200/85">
+                  &gt; name:
+                  {activeField === "name" ? (
+                    <motion.span
+                      animate={{ opacity: [1, 0.25, 1] }}
+                      transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
+                      className="ml-1 inline-block h-3.5 w-[2px] translate-y-[1px] bg-cyan-300"
+                    />
+                  ) : null}
+                </span>
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
+                  onFocus={() => setActiveField("name")}
+                  onBlur={() => setActiveField(null)}
                   disabled={isSending}
-                  className="mt-1 w-full rounded-md border border-white/12 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/45 disabled:opacity-65"
+                  className="mt-1 w-full rounded-md border border-white/12 bg-white/[0.03] px-3 py-2 text-sm text-white caret-cyan-200 outline-none transition-all duration-200 focus:border-cyan-300/45 focus:bg-cyan-300/[0.04] focus:shadow-[0_0_0_1px_rgba(34,211,238,0.22),0_0_14px_rgba(34,211,238,0.16)] disabled:opacity-65"
                   placeholder="operator_name"
                 />
               </label>
 
               <label className="block">
-                <span className="text-cyan-200/85">&gt; email:</span>
+                <span className="text-cyan-200/85">
+                  &gt; email:
+                  {activeField === "email" ? (
+                    <motion.span
+                      animate={{ opacity: [1, 0.25, 1] }}
+                      transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
+                      className="ml-1 inline-block h-3.5 w-[2px] translate-y-[1px] bg-cyan-300"
+                    />
+                  ) : null}
+                </span>
                 <input
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  onFocus={() => setActiveField("email")}
+                  onBlur={() => setActiveField(null)}
                   disabled={isSending}
-                  className="mt-1 w-full rounded-md border border-white/12 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/45 disabled:opacity-65"
+                  className="mt-1 w-full rounded-md border border-white/12 bg-white/[0.03] px-3 py-2 text-sm text-white caret-cyan-200 outline-none transition-all duration-200 focus:border-cyan-300/45 focus:bg-cyan-300/[0.04] focus:shadow-[0_0_0_1px_rgba(34,211,238,0.22),0_0_14px_rgba(34,211,238,0.16)] disabled:opacity-65"
                   placeholder="operator_email"
                 />
               </label>
 
               <label className="block">
-                <span className="text-cyan-200/85">&gt; message:</span>
+                <span className="text-cyan-200/85">
+                  &gt; message:
+                  {activeField === "message" ? (
+                    <motion.span
+                      animate={{ opacity: [1, 0.25, 1] }}
+                      transition={{ duration: 0.85, repeat: Infinity, ease: "linear" }}
+                      className="ml-1 inline-block h-3.5 w-[2px] translate-y-[1px] bg-cyan-300"
+                    />
+                  ) : null}
+                </span>
                 <textarea
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
+                  onFocus={() => setActiveField("message")}
+                  onBlur={() => setActiveField(null)}
                   disabled={isSending}
                   rows={4}
-                  className="mt-1 w-full resize-none rounded-md border border-white/12 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/45 disabled:opacity-65"
+                  className="mt-1 w-full resize-none rounded-md border border-white/12 bg-white/[0.03] px-3 py-2 text-sm text-white caret-cyan-200 outline-none transition-all duration-200 focus:border-cyan-300/45 focus:bg-cyan-300/[0.04] focus:shadow-[0_0_0_1px_rgba(34,211,238,0.22),0_0_14px_rgba(34,211,238,0.16)] disabled:opacity-65"
                   placeholder="transmission_payload"
                 />
               </label>
@@ -246,7 +298,12 @@ export default function ContactWindow() {
                   disabled={isSending}
                   className="rounded-md border border-cyan-300/35 bg-cyan-300/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 transition hover:bg-cyan-300/16 disabled:cursor-wait disabled:opacity-80"
                 >
-                  &gt; {isSending ? "transmitting..." : "send()"}
+                  <motion.span
+                    animate={isSending ? { opacity: [0.8, 1, 0.8], textShadow: ["0 0 0px rgba(34,211,238,0)", "0 0 12px rgba(34,211,238,0.7)", "0 0 0px rgba(34,211,238,0)"] } : { opacity: 1, textShadow: "0 0 0px rgba(34,211,238,0)" }}
+                    transition={isSending ? { duration: 1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
+                  >
+                    &gt; {isSending ? "TRANSMITTING..." : "send()"}
+                  </motion.span>
                 </button>
 
                 <p className="text-xs text-slate-300/80">
@@ -261,7 +318,7 @@ export default function ContactWindow() {
                 <motion.p
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-xs font-medium text-emerald-200/90"
+                  className="text-xs font-medium text-emerald-200/95 drop-shadow-[0_0_10px_rgba(74,222,128,0.48)]"
                 >
                   [ SUCCESS ] Transmission acknowledged.
                 </motion.p>
@@ -275,7 +332,24 @@ export default function ContactWindow() {
             </div>
 
             <div className="mb-3 space-y-2 rounded-lg border border-emerald-300/25 bg-emerald-400/10 p-3 text-xs text-emerald-200/90">
-              <p className="font-semibold uppercase tracking-[0.14em]">{portfolio.personal.statusLabel}</p>
+              <p className="font-semibold uppercase tracking-[0.14em]">
+                {portfolio.personal.statusLabel}
+                <motion.span
+                  animate={{ opacity: [0.45, 1, 0.45] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                  className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-emerald-300 align-middle"
+                />
+              </p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-100/85">
+                <motion.span
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                  className="mr-1 inline-block"
+                >
+                  ●
+                </motion.span>
+                SIGNAL: STRONG
+              </p>
               <p>{portfolio.personal.responseTime}</p>
             </div>
 
@@ -286,9 +360,9 @@ export default function ContactWindow() {
                   href={channel.href}
                   target={channel.href.startsWith("http") ? "_blank" : undefined}
                   rel={channel.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  whileHover={{ x: 4, y: -1 }}
+                  whileHover={{ x: 4, y: -2 }}
                   whileTap={{ scale: 0.99 }}
-                  className="group relative flex items-center gap-3 overflow-hidden rounded-lg border border-white/12 bg-white/[0.03] px-3 py-3 text-sm text-slate-100/92 transition hover:border-cyan-300/35"
+                  className="group relative flex items-center gap-3 overflow-hidden rounded-lg border border-white/12 bg-white/[0.03] px-3 py-3 text-sm text-slate-100/92 shadow-[0_0_0_rgba(34,211,238,0)] transition-all duration-200 hover:border-cyan-300/35 hover:shadow-[0_0_16px_rgba(34,211,238,0.18)]"
                 >
                   <div className={`pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-gradient-to-br ${channel.colorClass} opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100`} />
                   <div className="rounded-md border border-white/12 bg-white/[0.05] p-2">

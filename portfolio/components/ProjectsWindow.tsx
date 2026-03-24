@@ -360,7 +360,11 @@ export default function ProjectsWindow() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-xl border border-white/12 bg-white/[0.04] p-4 backdrop-blur-xl">
+          <motion.section
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.24, ease: "easeOut" }}
+            className="overflow-hidden rounded-xl border border-white/12 bg-white/[0.04] p-4 backdrop-blur-xl transition-all duration-300 hover:border-cyan-200/28 hover:shadow-[0_14px_36px_rgba(2,8,23,0.52),0_0_0_1px_rgba(34,211,238,0.1)]"
+          >
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.13em] text-slate-200/85">
               <Database size={12} /> Project Details
             </div>
@@ -375,45 +379,80 @@ export default function ProjectsWindow() {
                 className="space-y-3"
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{selected.name}</h3>
-                  <p className="text-xs text-slate-300/75">{selected.module}</p>
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/78">[ ACTIVE PROJECT MODULE ]</p>
+                    <h3 className="bg-gradient-to-r from-cyan-100 via-sky-100 to-violet-100 bg-clip-text text-lg font-bold text-transparent drop-shadow-[0_0_10px_rgba(125,211,252,0.3)]">
+                      {selected.name}
+                    </h3>
+                    <p className="text-xs text-slate-300/75">{selected.module}</p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.12em] text-slate-300/65">
+                      <span className="rounded-full border border-white/12 bg-white/[0.03] px-2 py-0.5">Last Updated: {portfolio.projects.find((p) => p.id === selected.id)?.date ?? "Synced"}</span>
+                      <span className="rounded-full border border-white/12 bg-white/[0.03] px-2 py-0.5">Version: v1.0</span>
+                    </div>
                 </div>
 
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="rounded-md border border-white/12 bg-black/20 px-2.5 py-2">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Status</p>
-                    <p className="mt-1 text-sm text-cyan-100">{selected.status}</p>
+                      <motion.span
+                        animate={selected.status === "Production" ? { boxShadow: ["0 0 0 rgba(45,212,191,0)", "0 0 12px rgba(45,212,191,0.45)", "0 0 0 rgba(45,212,191,0)"] } : undefined}
+                        transition={selected.status === "Production" ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" } : undefined}
+                        className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${
+                          selected.status === "Production"
+                            ? "border-emerald-200/45 bg-emerald-300/14 text-emerald-100"
+                            : "border-amber-200/40 bg-amber-300/12 text-amber-100"
+                        }`}
+                      >
+                        {selected.status}
+                      </motion.span>
                   </div>
                   <div className="rounded-md border border-white/12 bg-black/20 px-2.5 py-2">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Type</p>
-                    <p className="mt-1 text-sm text-cyan-100">{selected.type}</p>
+                      <span className="mt-1 inline-flex items-center rounded-full border border-cyan-200/35 bg-cyan-300/12 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-cyan-100 shadow-[0_0_10px_rgba(34,211,238,0.2)]">
+                        {selected.type}
+                      </span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Tech Stack</p>
-                  <p className="text-sm text-slate-200/85">{selected.stack.join(" - ")}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selected.stack.map((item) => (
+                        <motion.span
+                          key={item}
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ type: "spring", stiffness: 340, damping: 22 }}
+                          className="rounded-full border border-white/16 bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-slate-100/90 shadow-[0_0_0_rgba(34,211,238,0)] transition-all duration-200 hover:border-cyan-200/45 hover:bg-cyan-300/12 hover:text-cyan-100 hover:shadow-[0_0_10px_rgba(34,211,238,0.28)]"
+                        >
+                          {item}
+                        </motion.span>
+                      ))}
+                    </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Key Features</p>
                   {selected.features.map((feature) => (
-                    <p key={feature} className="text-sm text-slate-200/88">- {feature}</p>
+                      <p key={feature} className="text-sm leading-relaxed text-slate-200/88">
+                        <span className="mr-1.5 text-cyan-200/90">-&gt;</span>
+                        {feature}
+                      </p>
                   ))}
                 </div>
 
                 <div className="space-y-1.5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300/70">Impact</p>
-                  <p className="text-sm text-slate-200/88">{selected.impact}</p>
+                    <div className="rounded-lg border border-cyan-200/22 bg-gradient-to-r from-cyan-300/8 via-sky-300/6 to-violet-300/8 px-3 py-2 shadow-[0_0_16px_rgba(34,211,238,0.12)]">
+                      <p className="text-[14px] leading-relaxed text-slate-100/92">{selected.impact}</p>
+                    </div>
                 </div>
 
                 <motion.button
                   type="button"
                   onClick={handleLaunch}
                   disabled={isLaunching}
-                  whileHover={{ y: isLaunching ? 0 : -2 }}
+                    whileHover={isLaunching ? undefined : { y: -2, scale: 1.02 }}
                   whileTap={{ scale: isLaunching ? 1 : 0.98 }}
-                  className="inline-flex items-center gap-2 rounded-md border border-cyan-200/35 bg-cyan-300/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 disabled:cursor-wait disabled:opacity-80"
+                    className="inline-flex items-center gap-2 rounded-md border border-cyan-200/42 bg-cyan-300/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-100 shadow-[0_6px_20px_rgba(34,211,238,0.16)] transition-all duration-250 hover:border-cyan-100/60 hover:bg-cyan-300/20 hover:shadow-[0_10px_24px_rgba(34,211,238,0.26)] disabled:cursor-wait disabled:opacity-80"
                 >
                   <Rocket size={12} />
                   {isLaunching ? "Launching..." : "Launch Project"}
@@ -421,7 +460,7 @@ export default function ProjectsWindow() {
                 </motion.button>
               </motion.div>
             </AnimatePresence>
-          </section>
+            </motion.section>
         </div>
 
         <section className="overflow-hidden rounded-xl border border-emerald-300/16 bg-black/50 backdrop-blur-xl">
