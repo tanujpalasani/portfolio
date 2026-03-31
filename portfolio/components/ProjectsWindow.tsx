@@ -14,6 +14,7 @@ type ProjectModule = {
   id: string;
   module: string;
   name: string;
+  previewImage: string;
   status: ProjectStatus;
   type: ProjectType;
   stack: string[];
@@ -24,6 +25,12 @@ type ProjectModule = {
   logs: string[];
   launchUrl: string;
 };
+
+const PROJECT_PREVIEW_IMAGES = [
+  "/project_images/Project1.png",
+  "/project_images/Project2.png",
+  "/project_images/Project 3.png",
+] as const;
 
 const PROJECTS: ProjectModule[] = portfolio.projects.map((project, index) => {
   const projectType: ProjectType = project.techStack.some((item) =>
@@ -48,6 +55,7 @@ const PROJECTS: ProjectModule[] = portfolio.projects.map((project, index) => {
     id: project.id,
     module: `portfolio.${project.id}`,
     name: project.name,
+    previewImage: PROJECT_PREVIEW_IMAGES[index] ?? PROJECT_PREVIEW_IMAGES[0],
     status: projectType === "Machine Learning" ? "Prototype" : "Production",
     type: projectType,
     stack: project.techStack,
@@ -331,6 +339,27 @@ export default function ProjectsWindow() {
                       className={`pointer-events-none absolute -inset-10 bg-gradient-to-br ${selected.accent} blur-3xl`}
                       animate={{ scale: [1, 1.06, 1], opacity: [0.35, 0.55, 0.35] }}
                       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    />
+
+                    <motion.img
+                      src={selected.previewImage}
+                      alt={`${selected.name} preview`}
+                      initial={{ opacity: 0.32, scale: 1.02, x: -6, y: 4 }}
+                      animate={{
+                        opacity: 0.52,
+                        scale: [1.02, 1.07, 1.04, 1.02],
+                        x: [-6, 8, 2, -6],
+                        y: [4, -6, 2, 4],
+                      }}
+                      transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+                      className="pointer-events-none absolute inset-0 h-full w-full object-cover brightness-110 contrast-110 saturate-150"
+                    />
+
+                    <motion.div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent blur-xl"
+                      animate={{ x: ["-10%", "240%"] }}
+                      transition={{ duration: 3.8, repeat: Infinity, ease: "linear", repeatDelay: 1.1 }}
                     />
 
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.08] via-transparent to-black/35" />
